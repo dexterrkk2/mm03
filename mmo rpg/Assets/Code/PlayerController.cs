@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Rigidbody2D rig;
     public int kills;
     public bool dead;
-    private bool flashingDamage;
     public SpriteRenderer sr;
     public static PlayerController me;
     public Animator weaponAnim;
@@ -39,13 +38,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         lastAttackTime = Time.time;
 
-        Vector3 dir = (Input.mousePosition - Camera.main.ScreenToWorldPoint(transform.position)).normalized;
+        Vector3 dir = (Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position)).normalized;
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position + dir, dir, attackRange);
 
-        if (hit.collider != null && hit.collider.gameObject.CompareTag("Enemy"))
+        if (hit.collider != null && hit.collider.gameObject.CompareTag("enemy"))
         {
-
+            Enemy enemy = hit.collider.GetComponent<Enemy>();
+            enemy.photonView.RPC("TakeDamage", RpcTarget.MasterClient, damage);
         }
         weaponAnim.SetTrigger("Attack");
     }
@@ -103,26 +103,28 @@ public class PlayerController : MonoBehaviourPunCallbacks
         curHp -= damage;
         headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp);
         // flash the player red
-        photonView.RPC("DamageFlash", RpcTarget.Others);
         // update the health bar UI
         // die if no health left
-        GameUI.instance.UpdateHealthBar();
         if (curHp <= 0)
         {
             Die();
         }
         else
         {
-            StartCoroutine(DamageFlashCoRoutine());
-            IEnumerator DamageFlashCoRoutine()
-            {
-                flashingDamage = true;
-                Color defaultColor = sr.color;
-                sr.color = Color.red;
-                yield return new WaitForSeconds(0.05f);
-                sr.color = defaultColor;
-                flashingDamage = false;
-            }
+            photonView.RPC("FlashDamage", RpcTarget.All);
+        }
+    }
+    [PunRPC]
+    void FlashDamage()
+    {
+        StartCoroutine(DamageFlashCoRoutine());
+        IEnumerator DamageFlashCoRoutine()
+        {
+
+            Color defaultColor = sr.color;
+            sr.color = Color.red;
+            yield return new WaitForSeconds(0.05f);
+            sr.color = defaultColor;
         }
     }
     void Die()
@@ -143,6 +145,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     void GiveGold(int goldToGive)
     {
         gold += goldToGive;
+        GameUI.instance.UpdateGoldText(gold);
     }
     [PunRPC]
     public void AddKill()
@@ -153,7 +156,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public void Heal (int amountToheal)
     {
         curHp = Mathf.Clamp(curHp + amountToheal, 0, maxHp);
-        GameUI.instance.UpdateHealthBar();
+        //GameUI.instance.UpdateHealthBar();
     }
     IEnumerator Spawn (Vector3 spawnPos, float timeToSpawn)
     {
