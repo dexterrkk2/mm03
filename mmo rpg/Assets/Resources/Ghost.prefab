@@ -178,16 +178,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd3aafa9741aaf444b4b093d40029f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyName: enemy
+  enemyName: Lost Soul
   moveSpeed: 3
-  curhp: 20
-  maxhp: 20
+  curhp: 100
+  maxhp: 100
   chaseRange: 5
   attackRange: 1.5
   playerDetectRate: 0.2
   objectToSpawnOnDeath: silverPickup
   damage: 10
-  attackRate: 2
+  attackRate: 1
   lastAttackTime: 0
   healthbar: {fileID: 4879518884471222267}
   sr: {fileID: 7405800060507771499}
@@ -302,7 +302,7 @@ PrefabInstance:
       objectReference: {fileID: 4546496412954459788}
     - target: {fileID: 2969906097377381257, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
       propertyPath: level
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2969906097377381257, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
       propertyPath: xpBar

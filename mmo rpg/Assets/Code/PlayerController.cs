@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     [Header("Photon")]
     public int id;
@@ -36,17 +36,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
         rig.velocity = new Vector2(x, y) * moveSpeed;
-    }
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(level);
-        }
-        else if (stream.IsReading)
-        {
-            level = (int)stream.ReceiveNext();
-        }
     }
     void Attack()
     {
@@ -118,9 +107,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             return;
         curHp -= damage;
         headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp, maxHp);
-        // flash the player red
-        // update the health bar UI
-        // die if no health left
         if (curHp <= 0)
         {
             Die();
@@ -148,10 +134,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         dead = true;
         gold = 0;
         GameUI.instance.UpdateGoldText(gold);
-        if (PhotonNetwork.IsMasterClient)
-        {
-            //GameManager.instance.CheckWinCondition();
-        }
         rig.isKinematic = true;
         transform.position = new Vector3(0, 99, 0);
 
@@ -163,6 +145,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         gold += goldToGive;
         GameUI.instance.UpdateGoldText(gold);
+        GameManager.instance.CheckWinCondition(id);
     }
     [PunRPC]
     public void AddKill()
@@ -181,6 +164,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         dead = false;
         transform.position = spawnPos;
         curHp = ((int)maxHp);
+        headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp, maxHp);
         rig.isKinematic = false;
     }
     [PunRPC]

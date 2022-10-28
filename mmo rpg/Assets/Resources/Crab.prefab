@@ -178,15 +178,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd3aafa9741aaf444b4b093d40029f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyName: enemy
+  enemyName: Mr.Crabs
   moveSpeed: 3
-  curhp: 200
-  maxhp: 200
+  curhp: 400
+  maxhp: 400
   chaseRange: 5
   attackRange: 1.5
   playerDetectRate: 0.2
   objectToSpawnOnDeath: TreasurePickup
-  damage: 10
+  damage: 30
   attackRate: 2
   lastAttackTime: 0
   healthbar: {fileID: 4879518884471222267}

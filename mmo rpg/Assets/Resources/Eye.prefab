@@ -124,8 +124,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.005396366, y: 0}
-  m_Size: {x: 1, y: 1}
+  m_Offset: {x: 0.24732852, y: -0.66553307}
+  m_Size: {x: 4.1765685, y: 4.1765685}
   m_Direction: 0
 --- !u!114 &8100849550785707565
 MonoBehaviour:
@@ -178,16 +178,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd3aafa9741aaf444b4b093d40029f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyName: enemy
+  enemyName: Eye
   moveSpeed: 3
   curhp: 2000
   maxhp: 2000
-  chaseRange: 5
+  chaseRange: 10
   attackRange: 5
   playerDetectRate: 0.2
   objectToSpawnOnDeath: ChestPickup
   damage: 50
-  attackRate: 2
+  attackRate: 1
   lastAttackTime: 0
   healthbar: {fileID: 4879518884471222267}
   sr: {fileID: 7405800060507771499}

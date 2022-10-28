@@ -6,7 +6,9 @@ public class teleporter : MonoBehaviour
 {
     public Transform teleportLocation;
     public bool playerIsOverlapping;
-    public Collider playercheck;
+    public Collider2D playercheck;
+    public float delay = 2f;
+    public float playerCheckTIme;
     private void Update()
     {
         if (playerIsOverlapping)
@@ -15,23 +17,14 @@ public class teleporter : MonoBehaviour
             {
                 if (player.transform.position == playercheck.transform.position)
                 {
-                    Vector2 portalToPlayer = player.transform.position - transform.position;
-                    float dotProduct = Vector3.Dot(transform.up, portalToPlayer);
-                    if (dotProduct < 0f)
-                    {
-                        float rotationDiff = -Quaternion.Angle(transform.rotation, teleportLocation.rotation);
-                        rotationDiff += 180;
-                        player.transform.Rotate(Vector2.up, rotationDiff);
-                        Vector3 positionOffset = Quaternion.Euler(0f, rotationDiff, 0f) * portalToPlayer;
-                        player.transform.position = teleportLocation.position + positionOffset;
-                        playerIsOverlapping = false;
-                    }
+                    player.transform.position = teleportLocation.position;
+                    playerIsOverlapping = false;
                 }
             }
         }
     }
     // Update is called once per frame
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log(other.tag);
         if(other.tag == "Player")
@@ -40,8 +33,9 @@ public class teleporter : MonoBehaviour
             playercheck = other;
         }
     }
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         playerIsOverlapping = false;
+        playerCheckTIme = Time.time;
     }
 }

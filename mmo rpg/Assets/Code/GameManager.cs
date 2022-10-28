@@ -40,18 +40,18 @@ public class GameManager : MonoBehaviourPunCallbacks
             SpawnPlayer();
         }
     }
-    //public void CheckWinCondition()
-    //{
-        //if(alivePlayers == 1)
-        //{
-            //photonView.RPC("WinGame", RpcTarget.All,players.First(x => !x.dead).id);
-        //}
-    //}
+    public void CheckWinCondition(int id)
+    {
+        if(players[id-1].gold >= 1000)
+        {
+            photonView.RPC("WinGame", RpcTarget.All,players, id);
+        }
+    }
     [PunRPC]
     void WinGame(int playerId)
     {
         // set the UI to show who's won
-        //GameUI.instance.SetWinText(GetPlayer(playerId).photonPlayer.NickName);
+        GameUI.instance.SetWinText(GetPlayer(playerId).photonPlayer.NickName);
         Invoke("GoBackToMenu", postGameTime);
     }
     void GoBackToMenu()
