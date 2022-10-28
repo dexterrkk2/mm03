@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1347899050853467119}
   - component: {fileID: 1761413534864124217}
   m_Layer: 0
-  m_Name: enemy
+  m_Name: Frog
   m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: -1939150231
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: -824864877, guid: 8d7fe99f408058c40b1bc94a6037f0f8, type: 3}
+  m_Sprite: {fileID: -1574301781, guid: 112ee62887c64d442bda66835362605d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -178,20 +178,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd3aafa9741aaf444b4b093d40029f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyName: enemy
-  moveSpeed: 3
-  curhp: 20
-  maxhp: 20
-  chaseRange: 5
-  attackRange: 1.5
+  enemyName: Froggy
+  moveSpeed: 4
+  curhp: 50
+  maxhp: 50
+  chaseRange: 10
+  attackRange: 2
   playerDetectRate: 0.2
-  objectToSpawnOnDeath: goldPickup
-  damage: 10
+  objectToSpawnOnDeath: SilverPickup
+  damage: 6
   attackRate: 1
   lastAttackTime: 0
   healthbar: {fileID: 4879518884471222267}
   sr: {fileID: 7405800060507771499}
   rig: {fileID: 8423466231681432096}
+  xpToGive: 0
 --- !u!1001 &7674328716453192818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -294,6 +295,26 @@ PrefabInstance:
     - target: {fileID: 915832199682055318, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167205966564413533, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -31.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2969906097377381257, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
+      propertyPath: level
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6167916259090979582, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
+      propertyPath: m_fontSize
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6167916259090979582, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6167916259090979582, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5723bb2238743b349a37b76f3f7ebae1, type: 3}

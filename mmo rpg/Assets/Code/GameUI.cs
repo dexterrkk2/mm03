@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Photon.Pun;
 public class GameUI : MonoBehaviour
 {
     public TextMeshProUGUI goldTxt;
@@ -18,4 +19,5 @@ public class GameUI : MonoBehaviour
     {
         goldTxt.text = "<b>Gold</b>:" + gold;
     }
+
 }

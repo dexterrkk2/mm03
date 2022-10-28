@@ -11,7 +11,7 @@ public class Enemy : MonoBehaviourPun
     public float moveSpeed;
 
     public int curhp;
-    public int maxhp;
+    public float maxhp;
 
     public float chaseRange;
     public float attackRange;
@@ -32,10 +32,14 @@ public class Enemy : MonoBehaviourPun
     public HeaderInfo healthbar;
     public SpriteRenderer sr;
     public Rigidbody2D rig;
-
+    public int xpToGive;
     private void Start()
     {
-        healthbar.Initialize(enemyName, maxhp);
+        if (xpToGive == 0)
+        {
+            xpToGive = ((int)maxhp);
+        }
+        healthbar.Initialize(enemyName, ((int)maxhp));
     }
     private void Update()
     {
@@ -47,8 +51,6 @@ public class Enemy : MonoBehaviourPun
         if(targetPlayer!= null)
         {
             float dist = Vector3.Distance(transform.position, targetPlayer.transform.position);
-            Debug.Log(dist);
-
             if(dist < attackRange && Time.time - lastAttackTime >= attackRate)
             {
                 Attack();
@@ -100,16 +102,16 @@ public class Enemy : MonoBehaviourPun
         }
     }
     [PunRPC]
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage,int playerid)
     {
         curhp -= damage;
-        healthbar.photonView.RPC("UpdateHealthBar", RpcTarget.All, curhp);
+        healthbar.photonView.RPC("UpdateHealthBar", RpcTarget.All, curhp, maxhp);
         // flash the player red
         // update the health bar UI
         // die if no health left
         if (curhp <= 0)
-        {
-            Die();
+        { 
+            Die(playerid);  
         }
         else
         {
@@ -129,8 +131,9 @@ public class Enemy : MonoBehaviourPun
             sr.color = defaultColor;
         }
     }
-    void Die()
+    void Die(int playerId)
     {
+        GameManager.instance.players[playerId -1].photonView.RPC("GiveXp", GameManager.instance.players[playerId - 1].photonPlayer, xpToGive);
         if (objectToSpawnOnDeath != string.Empty)
         {
             PhotonNetwork.Instantiate(objectToSpawnOnDeath, transform.position, Quaternion.identity);

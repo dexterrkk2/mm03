@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-public class PlayerController : MonoBehaviourPunCallbacks
-{ 
+public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
+{
     [Header("Photon")]
     public int id;
     public Player photonPlayer;
@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public float moveSpeed;
     public int gold;
     public int curHp;
-    public int maxHp;
+    public float maxHp;
 
     [Header("Components")]
     public Rigidbody2D rig;
@@ -24,15 +24,29 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Animator weaponAnim;
     public HeaderInfo headerInfo;
     [Header("Attack")]
-    public int damage;
+    public float damage;
     public float attackRange;
     public float attackRate;
     private float lastAttackTime;
+    public int xp;
+    public float maxXp;
+    public int level;
     void Move()
     {
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
-        rig.velocity = new Vector2(x,y) * moveSpeed;
+        rig.velocity = new Vector2(x, y) * moveSpeed;
+    }
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(level);
+        }
+        else if (stream.IsReading)
+        {
+            level = (int)stream.ReceiveNext();
+        }
     }
     void Attack()
     {
@@ -45,7 +59,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (hit.collider != null && hit.collider.gameObject.CompareTag("enemy"))
         {
             Enemy enemy = hit.collider.GetComponent<Enemy>();
-            enemy.photonView.RPC("TakeDamage", RpcTarget.MasterClient, damage);
+            enemy.photonView.RPC("TakeDamage", RpcTarget.MasterClient, ((int)damage), id);
         }
         weaponAnim.SetTrigger("Attack");
     }
@@ -58,14 +72,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
         Move();
 
-        if (Input.GetMouseButtonDown(0) && Time.time -lastAttackTime > attackRange)
+        if (Input.GetMouseButtonDown(0) && Time.time - lastAttackTime > attackRange)
         {
             Attack();
         }
 
         float mouseX = (Screen.width / 2) - Input.mousePosition.x;
 
-        if (mouseX <0)
+        if (mouseX < 0)
         {
             weaponAnim.transform.parent.localScale = new Vector3(1, 1, 1);
         }
@@ -77,13 +91,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void Initialize(Player player)
     {
+        level = 1;
+        maxXp = maxHp;
         id = player.ActorNumber;
         photonPlayer = player;
         //photonPlayer = player;
-      
+
         GameManager.instance.players[id - 1] = this;
 
-        headerInfo.Initialize(player.NickName, maxHp);
+        headerInfo.Initialize(player.NickName, ((int)maxHp));
         // if this isn't our local player, disable physics as that's
         // controlled by the user and synced to all other clients
         if (player.IsLocal)
@@ -101,7 +117,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (dead)
             return;
         curHp -= damage;
-        headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp);
+        headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp, maxHp);
         // flash the player red
         // update the health bar UI
         // die if no health left
@@ -130,7 +146,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     void Die()
     {
         dead = true;
-       
+        gold = 0;
+        GameUI.instance.UpdateGoldText(gold);
         if (PhotonNetwork.IsMasterClient)
         {
             //GameManager.instance.CheckWinCondition();
@@ -153,17 +170,37 @@ public class PlayerController : MonoBehaviourPunCallbacks
         kills++;
     }
     [PunRPC]
-    public void Heal (int amountToheal)
+    public void Heal(int amountToheal)
     {
-        curHp = Mathf.Clamp(curHp + amountToheal, 0, maxHp);
+        curHp = Mathf.Clamp(curHp + amountToheal, 0, ((int)maxHp));
         //GameUI.instance.UpdateHealthBar();
     }
-    IEnumerator Spawn (Vector3 spawnPos, float timeToSpawn)
+    IEnumerator Spawn(Vector3 spawnPos, float timeToSpawn)
     {
         yield return new WaitForSeconds(timeToSpawn);
         dead = false;
         transform.position = spawnPos;
-        curHp = maxHp;
+        curHp = ((int)maxHp);
         rig.isKinematic = false;
+    }
+    [PunRPC]
+    public void GiveXp(int xpToGive)
+    {
+        xp += xpToGive;
+        if (xp > maxXp)
+        {
+            LevelUP();
+        }
+        headerInfo.photonView.RPC("UpdateXpBar", RpcTarget.All, xp, maxXp, id);
+    }
+    public void LevelUP()
+    {
+        xp -= ((int)maxXp);
+        maxXp *= 1.2f;
+        maxHp *= 1.2f;
+        damage *= 1.2f;
+        level++;
+        curHp = ((int)maxHp);
+        headerInfo.photonView.RPC("UpdateHealthBar", RpcTarget.All, curHp, maxHp);
     }
 }
